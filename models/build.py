@@ -1,6 +1,6 @@
-from timm.models import create_model  
-from .MetaFG import *
-from .MetaFG_meta import *
+from timm.models import create_model
+
+
 def build_model(config):
     model_type = config.MODEL.TYPE
     if model_type == 'MetaFG':

@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
+
 class SwishImplementation(torch.autograd.Function):
     @staticmethod
     def forward(ctx, i):
@@ -18,6 +19,7 @@ class SwishImplementation(torch.autograd.Function):
         sigmoid_i = torch.sigmoid(i)
         return grad_output * (sigmoid_i * (1 + i * (1 - sigmoid_i)))
 
+
 class MemoryEfficientSwish(nn.Module):
     def forward(self, x):
         return SwishImplementation.apply(x)
@@ -25,7 +27,8 @@ class MemoryEfficientSwish(nn.Module):
 
 def drop_connect(inputs, p, training):
     """ Drop connect. """
-    if not training: return inputs
+    if not training:
+        return inputs
     batch_size = inputs.shape[0]
     keep_prob = 1 - p
     random_tensor = keep_prob
@@ -36,13 +39,17 @@ def drop_connect(inputs, p, training):
 
 
 def get_same_padding_conv2d(image_size=None):
-     return partial(Conv2dStaticSamePadding, image_size=image_size)
+    return partial(Conv2dStaticSamePadding, image_size=image_size)
+
 
 def get_width_and_height_from_size(x):
     """ Obtains width and height from a int or tuple """
     if isinstance(x, int): return x, x
-    if isinstance(x, list) or isinstance(x, tuple): return x
-    else: raise TypeError()
+    if isinstance(x, list) or isinstance(x, tuple):
+        return x
+    else:
+        raise TypeError()
+
 
 def calculate_output_image_size(input_image_size, stride):
     """
@@ -54,7 +61,6 @@ def calculate_output_image_size(input_image_size, stride):
     image_height = int(math.ceil(image_height / stride))
     image_width = int(math.ceil(image_width / stride))
     return [image_height, image_width]
-
 
 
 class Conv2dStaticSamePadding(nn.Conv2d):
@@ -82,6 +88,7 @@ class Conv2dStaticSamePadding(nn.Conv2d):
         x = F.conv2d(x, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return x
 
+
 class Identity(nn.Module):
     def __init__(self, ):
         super(Identity, self).__init__()
@@ -89,12 +96,15 @@ class Identity(nn.Module):
     def forward(self, input):
         return input
 
+
 # #MBConvBlock
 class MBConvBlock(nn.Module):
     '''
     层 ksize3*3 输入32 输出16  conv1  stride步长1
     '''
-    def __init__(self, ksize, input_filters, output_filters, expand_ratio=1, stride=1,image_size=224,drop_connect_rate=0.):
+
+    def __init__(self, ksize, input_filters, output_filters, expand_ratio=1, stride=1, image_size=224,
+                 drop_connect_rate=0.):
         super().__init__()
         self._bn_mom = 0.1
         self._bn_eps = 0.01
@@ -108,16 +118,15 @@ class MBConvBlock(nn.Module):
         inp = self._input_filters
         oup = self._input_filters * self._expand_ratio
         if self._expand_ratio != 1:
-            self._expand_conv = nn.Conv2d(in_channels=inp, out_channels=oup, kernel_size=1,bias=False)
+            self._expand_conv = nn.Conv2d(in_channels=inp, out_channels=oup, kernel_size=1, bias=False)
             self._bn0 = nn.BatchNorm2d(num_features=oup, momentum=self._bn_mom, eps=self._bn_eps)
-
 
         # Depthwise convolution
         k = self._kernel_size
-        s = self._stride        
+        s = self._stride
         self._depthwise_conv = nn.Conv2d(in_channels=oup, out_channels=oup, groups=oup,
-            kernel_size=k, stride=s, padding=1,bias=False)
-        
+                                         kernel_size=k, stride=s, padding=1, bias=False)
+
         self._bn1 = nn.BatchNorm2d(num_features=oup, momentum=self._bn_mom, eps=self._bn_eps)
         # Squeeze and Excitation layer, if desired
         num_squeezed_channels = max(1, int(self._input_filters * self._se_ratio))
@@ -126,7 +135,7 @@ class MBConvBlock(nn.Module):
 
         # Output phase
         final_oup = self._output_filters
-        self._project_conv = nn.Conv2d(in_channels=oup, out_channels=final_oup, kernel_size=1,bias=False)
+        self._project_conv = nn.Conv2d(in_channels=oup, out_channels=final_oup, kernel_size=1, bias=False)
         self._bn2 = nn.BatchNorm2d(num_features=final_oup, momentum=self._bn_mom, eps=self._bn_eps)
         self._swish = MemoryEfficientSwish()
 
@@ -157,13 +166,15 @@ class MBConvBlock(nn.Module):
         # Skip connection and drop connect
         input_filters, output_filters = self._input_filters, self._output_filters
         if self._stride == 1 and input_filters == output_filters:
-            if self._drop_connect_rate!=0:
+            if self._drop_connect_rate != 0:
                 x = drop_connect(x, p=self._drop_connect_rate, training=self.training)
             x = x + inputs  # skip connection
         return x
+
+
 if __name__ == '__main__':
-    input=torch.randn(1,3,112,112)
-    mbconv=MBConvBlock(ksize=3,input_filters=3,output_filters=3,expand_ratio=4,stride=1)
+    input = torch.randn(1, 3, 112, 112)
+    mbconv = MBConvBlock(ksize=3, input_filters=3, output_filters=3, expand_ratio=4, stride=1)
     print(mbconv)
-    out=mbconv(input)
+    out = mbconv(input)
     print(out.shape)

@@ -12,8 +12,8 @@ from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.utils import accuracy, AverageMeter
 
 from config import get_config
-from models import build_model
 from data import build_loader
+from models import build_model
 from lr_scheduler import build_scheduler
 from optimizer import build_optimizer
 from logger import create_logger
