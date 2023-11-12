@@ -2,6 +2,7 @@ numpy
 Pillow
 PyYAML
 scikit_learn
+tensorboard
 termcolor
 timm==0.4.12
 torch
