@@ -1,7 +1,6 @@
 import argparse
 import torch
 from timm.models import create_model
-from models.CoAt import *
 
 try:
     from mmcv.cnn import get_model_complexity_info
@@ -17,10 +16,11 @@ def parse_args():
         '--shape',
         type=int,
         nargs='+',
-        default=[224,],
+        default=[224, ],
         help='input image size')
     args = parser.parse_args()
     return args
+
 
 def get_flops(model, input_shape):
     flops, params = get_model_complexity_info(model, input_shape, as_strings=False)

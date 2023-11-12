@@ -1,6 +1,8 @@
 import torch.nn as nn
+
+
 class ResNormLayer(nn.Module):
-    def __init__(self, linear_size,):
+    def __init__(self, linear_size, ):
         super(ResNormLayer, self).__init__()
         self.l_size = linear_size
         self.nonlin1 = nn.ReLU(inplace=True)

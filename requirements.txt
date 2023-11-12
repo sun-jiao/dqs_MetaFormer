@@ -1,0 +1,10 @@
+numpy
+Pillow
+PyYAML
+scikit_learn
+termcolor
+timm==0.4.12
+torch
+torchvision
+transformers
+yacs
