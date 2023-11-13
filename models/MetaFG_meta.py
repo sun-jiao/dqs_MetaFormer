@@ -1,5 +1,4 @@
 import torch
-import torch
 import torch.nn as nn
 from timm.models.helpers import load_pretrained
 from timm.models.layers import trunc_normal_

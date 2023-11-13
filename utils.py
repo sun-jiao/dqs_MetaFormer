@@ -1,7 +1,6 @@
 import os
 import torch
 import importlib
-import torch.distributed as dist
 
 
 def relative_bias_interpolate(checkpoint, config):
@@ -146,10 +145,11 @@ def auto_resume_helper(output_dir):
 
 
 def reduce_tensor(tensor):
-    rt = tensor.clone()
-    dist.all_reduce(rt, op=dist.ReduceOp.SUM)
-    rt /= dist.get_world_size()
-    return rt
+    # rt = tensor.clone()
+    # dist.all_reduce(rt, op=dist.ReduceOp.SUM)
+    # rt /= dist.get_world_size()
+    # return rt
+    return tensor
 
 
 def load_ext(name, funcs):

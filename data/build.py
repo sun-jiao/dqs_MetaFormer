@@ -7,7 +7,6 @@
 import os
 
 import torch
-import torch.distributed as dist
 from sklearn.utils import class_weight
 from timm.data import Mixup
 from timm.data import create_transform
@@ -21,9 +20,9 @@ def build_loader(config):
     config.defrost()
     dataset_train, config.MODEL.NUM_CLASSES = build_dataset(is_train=True, config=config)
     config.freeze()
-    print(f"local rank {config.LOCAL_RANK} / global rank {dist.get_rank()} successfully build train dataset")
+    print(f"Successfully build train dataset in non-distributed mode.")
     dataset_val, _ = build_dataset(is_train=False, config=config)
-    print(f"local rank {config.LOCAL_RANK} / global rank {dist.get_rank()} successfully build val dataset")
+    print(f"Successfully build val dataset in non-distributed mode.")
 
     sampler_train = build_sampler(config, dataset_train)
 
@@ -31,17 +30,17 @@ def build_loader(config):
         dataset_train, sampler=sampler_train,
         batch_size=config.DATA.BATCH_SIZE,
         num_workers=config.DATA.NUM_WORKERS,
-        pin_memory=config.DATA.PIN_MEMORY,
-        drop_last=True,
+        # pin_memory=config.DATA.PIN_MEMORY,
+        # drop_last=True,
     )
 
     data_loader_val = torch.utils.data.DataLoader(
         dataset_val,
         batch_size=config.DATA.BATCH_SIZE,
-        shuffle=False,
+        shuffle=True,
         num_workers=config.DATA.NUM_WORKERS,
-        pin_memory=config.DATA.PIN_MEMORY,
-        drop_last=False
+        # pin_memory=config.DATA.PIN_MEMORY,
+        # drop_last=False
     )
 
     # setup mixup / cutmix

@@ -44,8 +44,7 @@ _C.DATA.VAL_PATH = None
 # arnold dataset parallel
 _C.DATA.NUM_READERS = 4
 
-
-#meta info
+# meta info
 _C.DATA.ADD_META = False
 _C.DATA.FUSION = 'early'
 _C.DATA.MASK_PROB = 0.0
@@ -70,7 +69,7 @@ _C.MODEL.DROP_RATE = 0.0
 _C.MODEL.DROP_PATH_RATE = 0.1
 # Label Smoothing
 _C.MODEL.LABEL_SMOOTHING = 0.1
-#pretrain
+# pretrain
 _C.MODEL.PRETRAINED = None
 _C.MODEL.DORP_HEAD = True
 _C.MODEL.DORP_META = True
@@ -78,8 +77,6 @@ _C.MODEL.DORP_META = True
 _C.MODEL.ONLY_LAST_CLS = False
 _C.MODEL.EXTRA_TOKEN_NUM = 1
 _C.MODEL.META_DIMS = []
-
-
 
 # -----------------------------------------------------------------------------
 # Training settings
@@ -89,9 +86,9 @@ _C.TRAIN.START_EPOCH = 0
 _C.TRAIN.EPOCHS = 300
 _C.TRAIN.WARMUP_EPOCHS = 20
 _C.TRAIN.WEIGHT_DECAY = 0.05
-_C.TRAIN.BASE_LR = 1e-4 # 5e-4
+_C.TRAIN.BASE_LR = 1e-4  # 5e-4
 _C.TRAIN.WARMUP_LR = 5e-7
-_C.TRAIN.MIN_LR = 1e-5 # 5e-6
+_C.TRAIN.MIN_LR = 1e-5  # 5e-6
 # Clip gradient norm
 _C.TRAIN.CLIP_GRAD = 5.0
 # Auto resume from latest checkpoint
@@ -177,9 +174,7 @@ _C.EVAL_MODE = False
 _C.THROUGHPUT_MODE = False
 # local rank for DistributedDataParallel, given by command line argument
 _C.LOCAL_RANK = 0
-
-
-
+_C.SAMPLING_RATIO = 1
 
 def _update_config_from_file(config, cfg_file):
     config.defrost()
@@ -229,11 +224,10 @@ def update_config(config, args):
     if args.throughput:
         config.THROUGHPUT_MODE = True
 
-        
     if args.num_workers is not None:
         config.DATA.NUM_WORKERS = args.num_workers
-        
-    #set lr and weight decay
+
+    # set lr and weight decay
     if args.lr is not None:
         config.TRAIN.BASE_LR = args.lr
     if args.min_lr is not None:
