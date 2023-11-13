@@ -14,7 +14,6 @@ from torch.optim import lr_scheduler
 import models
 from config import get_config
 from data import build_loader
-from lr_scheduler import build_scheduler
 from optimizer import build_optimizer
 from parse_args import parse_args
 
@@ -24,8 +23,7 @@ sampling_ratio = 1
 
 data_dir = './dataset'
 models_dir = './modelzoo'
-model_name = 'meta_fg2'
-num_class = None
+model_name = 'metafg-2-384'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 freeze = False
@@ -43,7 +41,7 @@ def max_index_file(directory, prefix, suffix):
                 index = int(index_str)
                 if index > max_index:
                     max_index = index
-                    max_file = filename
+                    max_file = os.path.join(directory, filename)
             except ValueError:
                 continue
 
@@ -169,5 +167,5 @@ if __name__ == '__main__':
 
     for i in range(100):  # uncomment本行时下面两行都应该缩进，否则会连训100轮不保存。
         # 训练模型
-        model = train_model(model, dataloaders, criterion, optimizer, scheduler, _num_epochs=25)
+        model = train_model(model, dataloaders, criterion, optimizer, scheduler, _num_epochs=1)
         save_model(model, models_dir, model_name)

@@ -18,7 +18,7 @@ from torch.utils.data import WeightedRandomSampler
 
 def build_loader(config):
     config.defrost()
-    dataset_train, config.MODEL.NUM_CLASSES = build_dataset(is_train=True, config=config)
+    dataset_train, _ = build_dataset(is_train=True, config=config)
     config.freeze()
     print(f"Successfully build train dataset in non-distributed mode.")
     dataset_val, _ = build_dataset(is_train=False, config=config)
