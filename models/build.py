@@ -16,6 +16,11 @@ def build_model(config):
             extra_token_num=config.MODEL.EXTRA_TOKEN_NUM,
             meta_dims=config.MODEL.META_DIMS
         )
+
+        if config.MODEL.FREEZE:
+            for name, param in model.named_parameters():
+                if 'head' not in name:
+                    param.requires_grad = False
     else:
         raise NotImplementedError(f"Unkown model: {model_type}")
 

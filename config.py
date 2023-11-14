@@ -77,6 +77,7 @@ _C.MODEL.DORP_META = True
 _C.MODEL.ONLY_LAST_CLS = False
 _C.MODEL.EXTRA_TOKEN_NUM = 1
 _C.MODEL.META_DIMS = []
+_C.MODEL.FREEZE = False
 
 # -----------------------------------------------------------------------------
 # Training settings
