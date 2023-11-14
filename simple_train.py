@@ -167,5 +167,5 @@ if __name__ == '__main__':
 
     for i in range(100):  # uncomment本行时下面两行都应该缩进，否则会连训100轮不保存。
         # 训练模型
-        model = train_model(model, dataloaders, criterion, optimizer, scheduler, _num_epochs=1)
+        model = train_model(model, dataloaders, criterion, optimizer, scheduler, _num_epochs=25)
         save_model(model, models_dir, model_name)

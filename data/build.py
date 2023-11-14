@@ -13,7 +13,8 @@ from timm.data import create_transform
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.data.transforms import _pil_interp
 from torchvision import datasets, transforms
-from torch.utils.data import WeightedRandomSampler
+from torch.utils.data import WeightedRandomSampler, Dataset
+from torchvision.datasets.folder import default_loader
 
 
 def build_loader(config):
@@ -72,7 +73,7 @@ def build_sampler(config, dataset_train):
 def build_dataset(is_train, config):
     transform = build_transform(is_train, config)
     subdir = 'train' if is_train else 'val'
-    image_dataset = datasets.ImageFolder(os.path.join(config.DATA.DATA_PATH, subdir), transform)
+    image_dataset = CustomImageFolder(os.path.join(config.DATA.DATA_PATH, subdir), transform)
 
     nb_classes = len(image_dataset.classes)
 
@@ -117,3 +118,18 @@ def build_transform(is_train, config):
     t.append(transforms.ToTensor())
     t.append(transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD))
     return transforms.Compose(t)
+
+
+class CustomImageFolder(datasets.ImageFolder):
+    def __init__(self, root, transform=None, target_transform=None, loader=default_loader):
+        super(CustomImageFolder, self).__init__(root, transform, target_transform, loader)
+
+        # 重新生成类别到索引的映射
+        self.classes, self.class_to_idx = self._find_classes(self.root)
+
+    def _find_classes(self, dir):
+        class_to_idx = {d.split('.', 1)[1] : int(d.split('.')[0]) for d in os.listdir(dir) if os.path.isdir(os.path.join(dir, d))}
+        classes = [d.split('.', 1)[1] for d in os.listdir(dir) if os.path.isdir(os.path.join(dir, d))]
+        classes.sort()
+
+        return classes, class_to_idx
