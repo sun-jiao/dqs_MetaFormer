@@ -202,6 +202,8 @@ def update_config(config, args):
     # merge from specific arguments
     if args.batch_size:
         config.DATA.BATCH_SIZE = args.batch_size
+    if args.sampling_ratio:
+        config.SAMPLING_RATIO = args.sampling_ratio
     if args.data_path:
         config.DATA.DATA_PATH = args.data_path
     if args.zip:
