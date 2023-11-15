@@ -118,9 +118,10 @@ def train_model(_model, _dataloaders, _criterion, _optimizer, _scheduler, _num_e
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
+            epoch_loss = epoch_loss / sampling_ratio
+            epoch_acc = epoch_acc / sampling_ratio
+
             if phase == 'train':
-                epoch_loss = epoch_loss / sampling_ratio
-                epoch_acc = epoch_acc / sampling_ratio
                 _scheduler.step(epoch_acc)
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
