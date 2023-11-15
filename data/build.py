@@ -13,8 +13,8 @@ from timm.data import Mixup
 from timm.data import create_transform
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.data.transforms import _pil_interp
+from torch.utils.data import WeightedRandomSampler, RandomSampler
 from torchvision import datasets, transforms
-from torch.utils.data import WeightedRandomSampler, Dataset
 from torchvision.datasets.folder import default_loader
 
 
@@ -26,7 +26,7 @@ def build_loader(config):
     dataset_val, _ = build_dataset(is_train=False, config=config)
     print(f"Successfully build val dataset in non-distributed mode.")
 
-    sampler_train = build_sampler(config, dataset_train)
+    sampler_train = build_sampler(config, dataset_train, is_train=True)
 
     data_loader_train = torch.utils.data.DataLoader(
         dataset_train, sampler=sampler_train,
@@ -36,10 +36,11 @@ def build_loader(config):
         # drop_last=True,
     )
 
+    sampler_val = build_sampler(config, dataset_val, is_train=False)
+
     data_loader_val = torch.utils.data.DataLoader(
-        dataset_val,
+        dataset_val, sampler=sampler_val,
         batch_size=config.DATA.BATCH_SIZE,
-        shuffle=True,
         num_workers=config.DATA.NUM_WORKERS,
         # pin_memory=config.DATA.PIN_MEMORY,
         # drop_last=False
@@ -57,16 +58,19 @@ def build_loader(config):
     return dataset_train, dataset_val, data_loader_train, data_loader_val, mixup_fn
 
 
-def build_sampler(config, dataset_train):
-    targets = dataset_train.targets  # 获取样本标签列表
-    weights = class_weight.compute_sample_weight("balanced", targets)
-    class_weights = torch.from_numpy(weights)
-
+def build_sampler(config, dataset, is_train):
     # sampling ratio is defined out scope for usage in train.
-    num_samples = int(math.ceil(len(dataset_train) * (config.SAMPLING_RATIO or 1)))
+    num_samples = int(math.ceil(len(dataset) * (config.SAMPLING_RATIO or 1)))
 
     # 创建可调整权重的采样器
-    _sampler = WeightedRandomSampler(weights=class_weights, num_samples=num_samples, replacement=True)
+    if is_train:
+        targets = dataset.targets  # 获取样本标签列表
+        weights = class_weight.compute_sample_weight("balanced", targets)
+        class_weights = torch.from_numpy(weights)
+
+        _sampler = WeightedRandomSampler(weights=class_weights, num_samples=num_samples, replacement=True)
+    else:
+        _sampler = RandomSampler(data_source=dataset, num_samples=num_samples, replacement=True)
 
     return _sampler
 

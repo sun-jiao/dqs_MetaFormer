@@ -98,7 +98,7 @@ def train_model(_model, _dataloaders, _criterion, _optimizer, _scheduler, _num_e
                             # scaler.step() 首先把梯度的值unscale回来.
                             # 如果梯度的值不是 infs 或者 NaNs, 那么调用optimizer.step()来更新权重,
                             # 否则，忽略step调用，从而保证权重不更新（不被破坏）
-                            scaler.step(optimizer)
+                            scaler.step(_optimizer)
 
                             # 准备着，看是否要增大scaler
                             scaler.update()
@@ -153,6 +153,7 @@ if __name__ == '__main__':
         args.num_workers = multiprocessing.cpu_count()
 
     config = get_config(args)
+    sampling_ratio = config.SAMPLING_RATIO
 
     torch.multiprocessing.set_sharing_strategy('file_system')
 
