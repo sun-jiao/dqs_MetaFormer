@@ -4,6 +4,7 @@
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Ze Liu
 # --------------------------------------------------------
+import math
 import os
 
 import torch
@@ -62,7 +63,7 @@ def build_sampler(config, dataset_train):
     class_weights = torch.from_numpy(weights)
 
     # sampling ratio is defined out scope for usage in train.
-    num_samples = int(len(dataset_train) * (config.SAMPLING_RATIO or 1))
+    num_samples = int(math.ceil(len(dataset_train) * (config.SAMPLING_RATIO or 1)))
 
     # 创建可调整权重的采样器
     _sampler = WeightedRandomSampler(weights=class_weights, num_samples=num_samples, replacement=True)
