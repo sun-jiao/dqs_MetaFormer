@@ -146,7 +146,20 @@ dmypy.json
 /datasets
 /dataset
 /modelzoo
-
+/test_image
 # package
 apex
+*.csv
+*.xlsx
 *.pth
+*.pt
+*.pyth
+*.png
+*.jpg
+*.JPG
+*.jpeg
+*.JPEG
+*.webp
+*.gif
+*.json
+*.zip
