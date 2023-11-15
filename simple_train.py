@@ -17,6 +17,10 @@ from data import build_loader
 from optimizer import build_optimizer
 from parse_args import parse_args
 
+if torch.cuda.is_available():
+    from torch.cuda.amp import autocast as autocast, GradScaler
+    scaler = GradScaler()
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 # Assuming you want to sample 10% of the dataset, the ratio should be 0.1
 sampling_ratio = 1
@@ -82,14 +86,30 @@ def train_model(_model, _dataloaders, _criterion, _optimizer, _scheduler, _num_e
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'train'):
                     # compute output
-                    outputs = _model(inputs)
-                    _, preds = torch.max(outputs, 1)
-                    loss = _criterion(outputs, labels)
+                    if torch.cuda.is_available():
+                        with autocast():
+                            outputs = _model(inputs)
+                            _, preds = torch.max(outputs, 1)
+                            loss = _criterion(outputs, labels)
+                        if phase == 'train':
+                            # Scales loss. 为了梯度放大.
+                            scaler.scale(loss).backward()
 
-                    # backward + optimize only if in training phase
-                    if phase == 'train':
-                        loss.backward()
-                        _optimizer.step()
+                            # scaler.step() 首先把梯度的值unscale回来.
+                            # 如果梯度的值不是 infs 或者 NaNs, 那么调用optimizer.step()来更新权重,
+                            # 否则，忽略step调用，从而保证权重不更新（不被破坏）
+                            scaler.step(optimizer)
+
+                            # 准备着，看是否要增大scaler
+                            scaler.update()
+                    else:
+                        outputs = _model(inputs)
+                        _, preds = torch.max(outputs, 1)
+                        loss = _criterion(outputs, labels)
+                        # backward + optimize only if in training phase
+                        if phase == 'train':
+                            loss.backward()
+                            _optimizer.step()
 
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
