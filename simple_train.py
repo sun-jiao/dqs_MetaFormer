@@ -115,11 +115,8 @@ def train_model(_model, _dataloaders, _criterion, _optimizer, _scheduler, _num_e
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
-
-            epoch_loss = epoch_loss / sampling_ratio
-            epoch_acc = epoch_acc / sampling_ratio
+            epoch_loss = (running_loss / dataset_sizes[phase]) / sampling_ratio
+            epoch_acc = (running_corrects.double() / dataset_sizes[phase]) / sampling_ratio
 
             if phase == 'train':
                 _scheduler.step(epoch_acc)
