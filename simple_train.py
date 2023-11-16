@@ -30,8 +30,6 @@ models_dir = './modelzoo'
 model_name = 'metafg-2-384'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-freeze = False
-
 
 def max_index_file(directory, prefix, suffix):
     max_index = -1
