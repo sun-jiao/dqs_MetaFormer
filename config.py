@@ -241,7 +241,8 @@ def update_config(config, args):
         config.TRAIN.WARMUP_EPOCHS = args.warmup_epochs
     if args.weight_decay is not None:
         config.TRAIN.WEIGHT_DECAY = args.weight_decay
-
+    if args.freeze:
+        config.MODEL.FREEZE = args.freeze
     if args.epochs is not None:
         config.TRAIN.EPOCHS = args.epochs
     if args.dataset is not None:

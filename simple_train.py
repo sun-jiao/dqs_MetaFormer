@@ -19,6 +19,7 @@ from parse_args import parse_args
 
 if torch.cuda.is_available():
     from torch.cuda.amp import autocast as autocast, GradScaler
+
     scaler = GradScaler()
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -182,7 +183,5 @@ if __name__ == '__main__':
     scheduler = lr_scheduler.ReduceLROnPlateau(
         optimizer, "max", factor=0.1, patience=3, verbose=True, threshold=5e-3, threshold_mode="abs")
 
-    for i in range(100):  # uncomment本行时下面两行都应该缩进，否则会连训100轮不保存。
-        # 训练模型
-        model = train_model(model, dataloaders, criterion, optimizer, scheduler, _num_epochs=25)
-        save_model(model, models_dir, model_name)
+    model = train_model(model, dataloaders, criterion, optimizer, scheduler, _num_epochs=config.TRAIN.EPOCHS)
+    save_model(model, models_dir, model_name)

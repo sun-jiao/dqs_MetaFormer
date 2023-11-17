@@ -35,7 +35,7 @@ def parse_args():
 
     parser.add_argument('--num-workers', type=int,
                         help="num of workers on dataloader ")
-
+    parser.add_argument('--freeze', type=bool, help='freeze model')
     parser.add_argument('--lr', type=float, metavar='LR',
                         help='learning rate')
     parser.add_argument('--weight-decay', type=float,
